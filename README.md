@@ -1,5 +1,18 @@
 # Extended Kalman Filter Project Starter Code
-Self-Driving Car Engineer Nanodegree Program
+
+
+* [Introduction](#Introduction)
+* [Setup](#Setup)
+* [Results](#Results)
+
+<BR>
+<BR>
+
+---
+## __Introduction__
+---
+
+### __Self-Driving Car Engineer Nanodegree Program__
 
 In this project you will utilize a kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower than the tolerance outlined in the project rubric. 
 
@@ -43,6 +56,11 @@ Here is the main protocol that main.cpp uses for uWebSocketIO in communicating w
 
 ["rmse_vy"]
 
+<BR>
+<BR>
+
+---
+## __Setup__
 ---
 
 ## Other Important Dependencies
@@ -132,3 +150,42 @@ still be compilable with cmake and make.
 ## How to write a README
 A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
 
+
+<BR>
+<BR>
+
+---
+## __Results__
+---
+
+Here follows the criteria for the rubric.
+
+__Criteria 1:__
+_px, py, vx, vy output coordinates must have an RMSE <= [.11, .11, 0.52, 0.52] when using the file: "obj_pose-laser-radar-synthetic-input.txt" which is the same data file the simulator uses for Dataset 1._
+
+The modifications to the project are able to meet the specifications required for accuracy.
+
+![pic1](./imgs/pic1.png)
+
+![pic1](./imgs/pic2.png)
+
+__Criteria 2:__
+_Your Sensor Fusion algorithm follows the general processing flow as taught in the preceding lessons._
+Yes.
+
+__Criteria 3:__
+_Your Kalman Filter algorithm handles the first measurements appropriately._
+The procedure for the first measurement is done appropiately following the lessons and example
+code given.
+
+__Criteria 4:__
+_Your Kalman Filter algorithm first predicts then updates._
+Yes
+
+__Criteria 5:__
+_Your Kalman Filter can handle radar and lidar measurements._
+The kalman filter designs takes measurement from both sensors and process them both.
+
+__Criteria 6:__
+_Your algorithm should avoid unnecessary calculations._
+Several optimizations were done to the filter code, althought more can always be done.
