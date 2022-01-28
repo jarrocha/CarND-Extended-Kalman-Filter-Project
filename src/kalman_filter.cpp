@@ -3,17 +3,25 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-/* 
- * Please note that the Eigen library does not initialize 
- *   VectorXd or MatrixXd objects with zeros upon creation.
- */
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef CONSTRAIN
+#define CONSTRAIN(a,low,high) MAX((low),MIN((a),(high)))
+#endif
 
 KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
-                        MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
+                        MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) 
+{
   x_ = x_in;
   P_ = P_in;
   F_ = F_in;
@@ -22,20 +30,80 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   Q_ = Q_in;
 }
 
-void KalmanFilter::Predict() {
+void KalmanFilter::Predict() 
+{
   /**
-   * TODO: predict the state
+   * Predict State
    */
+
+  x_ = F_ * x_ ;
+  // MatrixXd Ft = F_.transpose();
+  // P_ = F_ * P_ * Ft + Q_;
+  P_ = F_*P_*F_.transpose() + Q_;
 }
 
-void KalmanFilter::Update(const VectorXd &z) {
+void KalmanFilter::Update(const VectorXd &z) 
+{
   /**
-   * TODO: update the state by using Kalman Filter equations
-   */
+  * update the state by using Kalman Filter equations
+  */
+
+  VectorXd y = z - H_ * x_;
+  UpdateState(y);
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z) {
+void KalmanFilter::UpdateEKF(const VectorXd &z) 
+{
   /**
-   * TODO: update the state by using Extended Kalman Filter equations
-   */
+  * update the state by using Extended Kalman Filter equations
+  */
+
+  // px, py, vx, vy
+  VectorXd x_ekf(4);
+  x_ekf << x_(0), x_(1), x_(2), x_(3);
+
+  // Transformation step for state vector to polar coordinates conversion
+  double rho = sqrt(x_ekf[0]*x_ekf[0] + x_ekf[1]*x_ekf[1]);
+  double theta = atan2(x_ekf[1], x_ekf[0]);
+  double rho_dot = (x_ekf[0]*x_ekf[2] + x_ekf[1]*x_ekf[3]) / rho;
+
+  VectorXd h(3);
+  h << rho, theta, rho_dot;
+  VectorXd y = z - h;
+
+  if (y(1) > M_PI) {
+    while (y(1) > M_PI) {
+      y(1) -= M_PI;
+    }
+  } else {
+    while (y(1) < -M_PI) {
+      y(1) += M_PI;
+    }
+  }
+
+  UpdateState(y);
+}
+
+void KalmanFilter::UpdateState(const VectorXd &y)
+{
+  /*
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+  MatrixXd K =  P_ * Ht * Si;
+  // New state
+  x_ = x_ + (K * y);
+  int x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
+  */
+
+  MatrixXd S = H_ * P_ * H_.transpose() + R_;
+  MatrixXd K = P_ * H_.transpose() * S.inverse();
+
+  // New State
+  x_ = x_ + (K * y);
+  int x_size = x_.size();
+  MatrixXd Identity = MatrixXd::Identity(x_size, x_size);
+  P_ = (Identity - K * H_) * P_;
 }
