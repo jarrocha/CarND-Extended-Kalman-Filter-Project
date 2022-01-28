@@ -27,6 +27,17 @@ class FusionEKF {
   void ProcessMeasurement(const MeasurementPackage &measurement_pack);
 
   /**
+   * Make a prediction on the state and covariance matrices
+   */
+  void Predict(const MeasurementPackage &measurement_pack);
+
+  /**
+   * Use the sensor type to perform the update step.
+   * Update the state and covariance matrices.
+   */
+  void Update(const MeasurementPackage &measurement_pack);
+
+  /**
    * Kalman Filter update and prediction math lives in here.
    */
   KalmanFilter ekf_;
